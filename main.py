@@ -7,36 +7,45 @@ from threading import Thread
 from flask import Flask
 from datetime import datetime
 
-# --- CONFIGURATION ---
+# --- CONFIGURATION PERSO ---
 TELEGRAM_TOKEN = "7642660873:AAGiXckpM40zBVyx6ZFbW1OKmvHOFhj-cAs"
 CHAT_ID = "1200147518"
 
-# --- LE FAUX SERVEUR WEB (POUR RENDER) ---
+# ==========================================
+# 🌐 PARTIE 1 : LE FAUX SERVEUR WEB (POUR RENDER)
+# ==========================================
 app = Flask('')
 
 @app.route('/')
 def home():
-    return "<h1>🤖 Bot en ligne et actif !</h1>"
+    return "<h1>🤖 Bot PolySniper en ligne !</h1>"
 
 def run_web_server():
+    # Render nous donne un port spécifique, on doit l'utiliser
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
 
 def start_server_thread():
+    # On lance le serveur dans un "fil" séparé pour ne pas bloquer le bot
     t = Thread(target=run_web_server)
     t.start()
 
-# --- LE BOT (Code V14) ---
+# ==========================================
+# 🤖 PARTIE 2 : LE BOT (Moteur V14)
+# ==========================================
+
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 }
 
 WATCHLIST = {
+    # --- LEGENDES ---
     "0xd1c769317bd15de7768a70d0214cf0bbcc531d2b": {"name": "Theo4", "tags": ["politics", "us-election"], "tier": "S"},
     "0x2b38036d0132a0c493c4df42125e839211c21062": {"name": "PuntGod", "tags": ["politics", "crypto"], "tier": "A"},
     "0x6c3aae17140c5e3cde62380daaa323e38575c459": {"name": "Avraham", "tags": ["politics", "middle-east"], "tier": "S"},
     "0x84898b583d56054b502c6564f3edfad43b54e211": {"name": "Domah", "tags": ["volume", "mixed"], "tier": "A"},
     "0x006cc834Cc092684F1B56626E23BEdB3835c16ea": {"name": "TopG", "tags": ["finance"], "tier": "A"},
+    # --- AUTRES ---
     "0x1489046ca0f9980fc2d9a950d103d3bec02c1307": {"name": "Whale_1489", "tags": ["mixed"], "tier": "B"},
     "0x7f3c8979d0afa00007bae4747d5347122af05613": {"name": "Whale_7f3c", "tags": ["sports"], "tier": "B"},
     "0xa9b44dca52ed35e59ac2a6f49d1203b8155464ed": {"name": "Whale_a9b4", "tags": ["mixed"], "tier": "B"},
@@ -190,10 +199,9 @@ async def main_loop():
         await asyncio.sleep(60)
 
 if __name__ == "__main__":
-    # 1. On lance le faux serveur web dans un fil parallèle
+    # C'est la ligne MAGIQUE qui permet de lancer le site ET le bot en même temps
     start_server_thread()
     
-    # 2. On lance le bot
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
